@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fingerprint Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f4f4f4;
+    }
+    h2 {
+      color: #333;
+    }
+    form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Verify Fingerprint</h2>
+
+  <form id="verifyForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="file">Upload Fingerprint Image:</label>
+    <input type="file" id="file" name="file" accept="image/*" required>
+
+    <button type="submit">Verify</button>
+  </form>
+
+  <div class="result" id="result"></div>
+  <script>
+    document.getElementById("verifyForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const response = await fetch("/verify", {
+        method: "POST",
+        body: formData
+      });
+
+      const resultEl = document.getElementById("result");
+      resultEl.innerHTML = "";
+
+      try {
+        const data = await response.json();
+        console.log(data); // 🔍 Log to browser console
+
+        if (data.match !== undefined) {
+          const p = document.createElement("p");
+          p.innerText = `✅ Match: ${data.match ? "SAME" : "DIFFERENT"} | Score: ${data.similarity.toFixed(4)}`;
+          p.style.color = data.match ? "green" : "red";
+          resultEl.appendChild(p);
+
+          if (data.processed_mask) {
+            const img = document.createElement("img");
+            img.src = data.processed_mask;
+            img.alt = "Processed Fingerprint";
+            img.style.maxWidth = "400px";
+            img.style.border = "1px solid #ccc";
+            img.style.marginTop = "10px";
+            resultEl.appendChild(img);
+          }
+        } else if (data.error) {
+          resultEl.innerText = `❌ Error: ${data.error}`;
+          resultEl.style.color = "red";
+        }
+      } catch (err) {
+        resultEl.innerText = "❌ Failed to parse server response.";
+        resultEl.style.color = "red";
+      }
+    });
+  </script>
+
+
+</body>
+</html>
