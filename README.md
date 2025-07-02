@@ -45,7 +45,7 @@ Fingerprint-sensor/
 ### 1. Clone the Repository
 
 bash
-git clone https://github.com/YOUR_USERNAME/fingerprint-verification-app.git
+git clone https://github.com/Shark-Bot-X/Fingerprint-verification-system
 cd fingerprint-verification-app
 2. Install Dependencies
 pip install -r requirements.txt
